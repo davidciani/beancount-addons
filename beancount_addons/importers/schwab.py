@@ -16,19 +16,23 @@ import csv
 import os
 import re
 
+
 class SchwabBankImporter(importer.ImporterProtocol):
     def __init__(self, account, lastfour):
         self.account = account
         self.lastfour = lastfour
 
     def identify(self, f):
-        return re.match('XXXXXX.*{}_Checking_Transactions_.*\.CSV'.format(self.lastfour), os.path.basename(f.name))
+        return re.match(
+            r'XXXXXX.*{}_Checking_Transactions_.*\.CSV'.format(
+                self.lastfour), os.path.basename(
+                f.name))
 
     def extract(self, f):
         entries = []
 
         with open(f.name) as f:
-            for _ in range(3): # first 3 lines are garbage
+            for _ in range(3):  # first 3 lines are garbage
                 next(f)
 
             for index, row in enumerate(csv.reader(f)):
@@ -40,7 +44,7 @@ class SchwabBankImporter(importer.ImporterProtocol):
                 elif row[5]:
                     trans_amt = float(row[5].strip('$'))
                 else:
-                    continue # 0 dollar transaction
+                    continue  # 0 dollar transaction
 
                 trans_amt = '{:.2f}'.format(trans_amt)
 
@@ -58,9 +62,15 @@ class SchwabBankImporter(importer.ImporterProtocol):
                 )
 
                 txn.postings.append(
-                    data.Posting(self.account, amount.Amount(D(trans_amt),
-                        'USD'), None, None, None, None)
-                )
+                    data.Posting(
+                        self.account,
+                        amount.Amount(
+                            D(trans_amt),
+                            'USD'),
+                        None,
+                        None,
+                        None,
+                        None))
 
                 entries.append(txn)
 

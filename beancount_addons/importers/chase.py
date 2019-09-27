@@ -14,13 +14,15 @@ import csv
 import os
 import re
 
+
 class ChaseCCImporter(importer.ImporterProtocol):
     def __init__(self, account, lastfour):
         self.account = account
         self.lastfour = lastfour
 
     def identify(self, f):
-        return re.match('Chase{}.*\.CSV'.format(self.lastfour), os.path.basename(f.name))
+        return re.match(r'Chase{}.*\.CSV'.format(self.lastfour),
+                        os.path.basename(f.name))
 
     def extract(self, f):
         entries = []
@@ -29,7 +31,7 @@ class ChaseCCImporter(importer.ImporterProtocol):
             for index, row in enumerate(csv.DictReader(f)):
                 trans_date = parse(row['Trans Date']).date()
                 trans_desc = titlecase(row['Description'])
-                trans_amt  = row['Amount']
+                trans_amt = row['Amount']
 
                 meta = data.new_metadata(f.name, index)
 
@@ -45,11 +47,16 @@ class ChaseCCImporter(importer.ImporterProtocol):
                 )
 
                 txn.postings.append(
-                    data.Posting(self.account, amount.Amount(D(trans_amt),
-                        'USD'), None, None, None, None)
-                )
+                    data.Posting(
+                        self.account,
+                        amount.Amount(
+                            D(trans_amt),
+                            'USD'),
+                        None,
+                        None,
+                        None,
+                        None))
 
                 entries.append(txn)
 
         return entries
-
