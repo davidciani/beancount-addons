@@ -24,6 +24,21 @@ class ChaseCCImporter(importer.ImporterProtocol):
         return re.match(r'Chase{}.*\.CSV'.format(self.lastfour),
                         os.path.basename(f.name))
 
+    def file_account(self, f):
+        return self.account
+    
+    def file_date(self, f):
+        match = re.match(r'Chase\d{4}_Activity\d{8}_(\d{8})_\d{8}.CSV',
+                         os.path.basename(f.name),
+                         re.IGNORECASE)
+        
+        if match is not None:
+            return parse(match.group(1)).date()
+        
+    def file_name(self, f):
+        return f'Chase{self.lastfour}.csv'
+
+
     def extract(self, f):
         entries = []
 

@@ -28,12 +28,30 @@ class SchwabBankImporter(importer.ImporterProtocol):
                 self.lastfour), os.path.basename(
                 f.name))
 
+    def file_account(self, f):
+        return self.account
+    
+    def file_date(self, f):
+        with open(f.name) as fh:
+            line = fh.readline()
+
+        match = re.search(r'to (.{10})',
+                         line,
+                         re.IGNORECASE)
+        
+        if match is not None:
+            return parse(match.group(1)).date()
+        
+    def file_name(self, f):
+        return f'SchwabBank{self.lastfour}.csv'
+
     def extract(self, f):
         entries = []
 
         with open(f.name) as f:
-            for _ in range(3):  # first 3 lines are garbage
-                next(f)
+            while True:  # first 3 lines are garbage
+                if next(f) == 'Posted Transactions':
+                    break
 
             for index, row in enumerate(csv.reader(f)):
                 trans_date = parse(row[0]).date()
