@@ -60,7 +60,7 @@ class SchwabBankImporter(importer.ImporterProtocol):
                 if row[4]:
                     trans_amt = amount.Amount(D(row[4].strip('$')) * -1, 'USD')
                 elif row[5]:
-                    trans_amt = amount.Amount(D(row[5].strip('$')) * -1, 'USD')
+                    trans_amt = amount.Amount(D(row[5].strip('$')), 'USD')
                 else:
                     continue  # 0 dollar transaction
 
