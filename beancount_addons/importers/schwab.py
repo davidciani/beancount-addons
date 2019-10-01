@@ -58,13 +58,11 @@ class SchwabBankImporter(importer.ImporterProtocol):
                 trans_desc = titlecase(row[3])
 
                 if row[4]:
-                    trans_amt = float(row[4].strip('$')) * -1.
+                    trans_amt = amount.Amount(D(row[4].strip('$')) * -1, 'USD')
                 elif row[5]:
-                    trans_amt = float(row[5].strip('$'))
+                    trans_amt = amount.Amount(D(row[5].strip('$')) * -1, 'USD')
                 else:
                     continue  # 0 dollar transaction
-
-                trans_amt = '{:.2f}'.format(trans_amt)
 
                 meta = data.new_metadata(f.name, index)
 
@@ -82,9 +80,7 @@ class SchwabBankImporter(importer.ImporterProtocol):
                 txn.postings.append(
                     data.Posting(
                         self.account,
-                        amount.Amount(
-                            D(trans_amt),
-                            'USD'),
+                        trans_amt,
                         None,
                         None,
                         None,
