@@ -44,7 +44,7 @@ class ChaseCCImporter(importer.ImporterProtocol):
 
         with open(f.name) as f:
             for index, row in enumerate(csv.DictReader(f)):
-                trans_date = parse(row['Trans Date']).date()
+                trans_date = parse(row['Transaction Date']).date()
                 trans_desc = titlecase(row['Description'])
                 trans_amt = row['Amount']
 
