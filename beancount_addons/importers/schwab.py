@@ -50,7 +50,7 @@ class SchwabBankImporter(importer.ImporterProtocol):
 
         with open(f.name) as f:
             while True:  # first 3 lines are garbage
-                if next(f) == 'Posted Transactions':
+                if re.search('Posted Transactions', next(f)) is not None:
                     break
 
             for index, row in enumerate(csv.reader(f)):
