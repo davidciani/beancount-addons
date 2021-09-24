@@ -1,3 +1,4 @@
+from datetime import date
 from beancount.core.number import D
 from beancount.ingest import importer
 from beancount.core import account
@@ -10,36 +11,37 @@ from dateutil.parser import parse
 
 from titlecase import titlecase
 
+import sys
+
 import csv
 import os
 import re
 
 
-class ChaseCCImporter(importer.ImporterProtocol):
-    def __init__(self, account, lastfour):
+class AppleCardImporter(importer.ImporterProtocol):
+    def __init__(self, account):
         self.account = account
-        self.lastfour = lastfour
 
     def identify(self, f):
-        return re.match(
-            r"Chase{}.*\.CSV".format(self.lastfour), os.path.basename(f.name)
-        )
+        return re.match(r"Apple Card Transactions.+", os.path.basename(f.name))
 
     def file_account(self, f):
         return self.account
 
     def file_date(self, f):
         match = re.match(
-            r"Chase\d{4}_Activity\d{8}_(\d{8})_\d{8}.CSV",
+            r"Apple Card Transactions - (\w+) (\d{4}).csv",
             os.path.basename(f.name),
             re.IGNORECASE,
         )
 
         if match is not None:
-            return parse(match.group(1)).date()
+            return parse(
+                f"{match.group(2)}-{match.group(1)}", default=date(2021, 1, 31)
+            )
 
     def file_name(self, f):
-        return f"Chase{self.lastfour}.csv"
+        return f"AppleCard.csv"
 
     def extract(self, f):
         entries = []
@@ -47,18 +49,20 @@ class ChaseCCImporter(importer.ImporterProtocol):
         with open(f.name) as f:
             for index, row in enumerate(csv.DictReader(f)):
                 trans_date = parse(row["Transaction Date"]).date()
+                trans_payee = titlecase(row["Merchant"])
                 trans_desc = titlecase(row["Description"])
-                trans_amt = row["Amount"]
+                trans_amt = row["Amount (USD)"]
+                trans_type = row["Type"]
 
                 meta = data.new_metadata(f.name, index)
 
-                meta["original-description"] = trans_desc
+                meta["original-description"] = f"{trans_payee}"
 
                 txn = data.Transaction(
                     meta=meta,
                     date=trans_date,
                     flag=flags.FLAG_OKAY,
-                    payee=trans_desc,
+                    payee=trans_payee,
                     narration="",
                     tags=set(),
                     links=set(),
@@ -75,6 +79,29 @@ class ChaseCCImporter(importer.ImporterProtocol):
                         None,
                     )
                 )
+
+                if trans_type == "Installment":
+                    txn.postings.append(
+                        data.Posting(
+                            f"{self.account}:Installments",
+                            amount.Amount(-D(trans_amt), "USD"),
+                            None,
+                            None,
+                            None,
+                            None,
+                        )
+                    )
+                elif trans_type == "Payment":
+                    txn.postings.append(
+                        data.Posting(
+                            f"Equity:TransferSuspense",
+                            amount.Amount(-D(trans_amt), "USD"),
+                            None,
+                            None,
+                            None,
+                            None,
+                        )
+                    )
 
                 entries.append(txn)
 

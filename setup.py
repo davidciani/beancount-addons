@@ -22,5 +22,6 @@ setuptools.setup(
      python_requires='>=3.6',
      install_requires=[
          "beancount >= 2.2.3",
+         "titlecase >= 2.0.0"
      ],
 )
