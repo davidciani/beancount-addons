@@ -150,7 +150,7 @@ def extract(  # noqa: PLR0913
                 amount.Amount(number, currency),
                 None,
                 None,
-            )  # type: ignore
+            )
             new_entries.append(balance_entry)
 
     return data.sorted(new_entries)
@@ -374,4 +374,4 @@ def build_transaction(
         data.EMPTY_SET,
         data.EMPTY_SET,
         [posting],
-    )  # type: ignore
+    )
