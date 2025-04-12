@@ -20,8 +20,11 @@ classifiers = [
 ]
 dependencies = [
     #"beancount-reds-importers>=0.8.0",
-    "beancount>=2.3.5",
+    "beancount>=3.1.0",
     "beangulp>=0.2.0",
+    "bs4>=0.0.2",
+    "lxml>=5.3.2",
+    "pytz>=2025.2",
 ]
 requires-python = ">=3.13"
 
