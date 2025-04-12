@@ -21,8 +21,11 @@ from beancount.core.number import D
 from beangulp import mimetypes
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString, PageElement, Tag
- 
+
+from davidciani_beancount_addons import time_zone
 from davidciani_beancount_addons.importers import BalanceType
+
+DATE_ONLY_STR_LEN = 14
 
 
 class Importer(beangulp.Importer):
@@ -164,9 +167,11 @@ def parse_ofx_time(date_str: str | None) -> datetime.datetime | None:
     """
     if date_str is None:
         return None
-    if len(date_str) < 14:
-        return datetime.datetime.strptime(date_str[:8], "%Y%m%d")
-    return datetime.datetime.strptime(date_str[:14], "%Y%m%d%H%M%S")
+    if len(date_str) < DATE_ONLY_STR_LEN:
+        return datetime.datetime.strptime(date_str[:8], "%Y%m%d").astimezone(time_zone)
+    return datetime.datetime.strptime(date_str[:14], "%Y%m%d%H%M%S").astimezone(
+        time_zone,
+    )
 
 
 def find_acctids(contents: str) -> Generator[str]:

@@ -13,6 +13,7 @@ from beancount.core import amount, data, flags
 from beancount.core.number import D
 from beangulp import mimetypes
 
+from davidciani_beancount_addons import time_zone
 from davidciani_beancount_addons.importers import BalanceType
 
 
@@ -65,7 +66,11 @@ class CheckingImporter(beangulp.Importer):
     def date(self, filepath: str) -> date | None:
         """Return the optional renamed account filename."""
         contents = json.loads(Path(filepath).read_text())
-        return datetime.strptime(contents["ToDate"], "%m/%d/%Y")
+        return (
+            datetime.strptime(contents["ToDate"], "%m/%d/%Y")
+            .astimezone(time_zone)
+            .date()
+        )
 
     def filename(self, filepath: str) -> str | None:
         """Return the optional renamed account filename."""
@@ -80,7 +85,11 @@ class CheckingImporter(beangulp.Importer):
         new_entries = []
         for transaction in contents["PostedTransactions"]:
             # Basic transaction details
-            date = datetime.strptime(transaction["Date"], "%m/%d/%Y").date()
+            date = (
+                datetime.strptime(transaction["Date"], "%m/%d/%Y")
+                .astimezone(time_zone)
+                .date()
+            )
             narration = transaction["Description"]
 
             # Build metadata dictionary
