@@ -47,7 +47,7 @@ class CheckingImporter(beangulp.Importer):
         The only way to identify Schwab files is by the partialy redacted
         account number in the file path. Filepath format has changed over time.
         """
-        if mimetypes.guess_file_type(filepath, strict=False)[0] not in {
+        if mimetypes.guess_type(filepath, strict=False)[0] not in {
             "application/json",
         }:
             return False
