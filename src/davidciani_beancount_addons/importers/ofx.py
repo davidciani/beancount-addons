@@ -102,7 +102,7 @@ def extract(  # noqa: PLR0913
     account: str,
     flag: str,
     balance_type: BalanceType,
-) -> data.Entries:
+) -> data.Directives:
     """Extract transactions from an OFX file.
 
     Args:
