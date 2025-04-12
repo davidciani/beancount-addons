@@ -54,7 +54,7 @@ class CheckingImporter(beangulp.Importer):
 
         filepath_stem = Path(filepath).stem
 
-        if "checking" not in filepath_stem.lower():
+        if "checking_transactions" not in filepath_stem.lower():
             return False
 
         return bool(re.match(self.acctid_regexp, filepath_stem))
@@ -78,7 +78,7 @@ class CheckingImporter(beangulp.Importer):
             return self.basename + Path(filepath).suffix
         return None
 
-    def extract(self, filepath: str, existing: data.Entries) -> data.Entries:  # noqa: ARG002
+    def extract(self, filepath: str, existing: data.Entries) -> data.Directives:  # noqa: ARG002
         """Extract a list of partially complete transactions from the file."""
         contents = json.loads(Path(filepath).read_text())
 
