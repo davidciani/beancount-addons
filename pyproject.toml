@@ -1,3 +1,162 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "davidciani-beancount-addons"
+dynamic = ["version"]
+description = "My personal collection of beancount addons."
+readme = "README.md"
+license = {text = "MIT"}
+keywords = []
+authors = [{ name = "David Ciani", email = "dciani@davidciani.com" }]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+    #"beancount-reds-importers>=0.8.0",
+    "beancount>=2.3.5",
+    "beangulp>=0.2.0",
+]
+requires-python = ">=3.13"
+
+
+[project.urls]
+homepage = "https://github.com/davidciani/beancount-addons"
+repository = "https://github.com/davidciani/beancount-addons.git"
+issues = "https://github.com/davidciani/beancount-addons/issues"
+
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.2",
+    "pytest"
+]
+
+[tool.hatch.version]
+path = "src/davidciani_beancount_addons/__about__.py"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/davidciani_beancount_addons"]
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/davidciani_beancount_addons tests}"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[tool.coverage.run]
+source_pkgs = ["davidciani_beancount_addons", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/davidciani_beancount_addons/__about__.py",
+]
+
+[tool.coverage.paths]
+davidciani_beancount_addons = ["src/davidciani_beancount_addons", "*/test-proj/src/davidciani_beancount_addons"]
+tests = ["tests", "*/davidciani_beancount_addons/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+
+
+
+[tool.ruff.lint]
+select = [
+    "A", # flake8-builtins
+    "ANN", # flake8-annotations
+    "ARG", # flake8-unused-arguments
+    "ASYNC", # flake8-async
+    "B", # flake8-bugbear
+    "BLE", # flake8-blind-except
+    "C4", # flake8-comprehensions
+    "C90", # mccabe
+    "COM", # flake8-commas
+    "CPY", # flake8-copyright
+    "D", # pydocstyle
+    "DTZ", # flake8-datetimez
+    "E", # pycoodestyle
+    "EM", # flake8-errmsg
+    "ERA", # eradicate
+    "EXE", # flake8-executable
+    "F", # pyflakes
+    "FA", # flake8-future-annotations
+    "FBT", # flake8-boolean-trap
+    "FIX", # flake8-fixme
+    "FLY", # flynt
+    "FURB", # refurb
+    "G", # flake8-logging-format
+    "I", # isort
+    "ICN", # flake8-import-conventions
+    "INP", # flake8-no-pep420
+    "ISC", # flake8-implicit-str-concat
+    "LOG", # flake8-logging
+    "N", # pep8-naming
+    "PERF", # perflint
+    "PGH", # pygrep-hooks
+    "PIE", # flake8-pie
+    "PL", # pylint
+    "PT", # flake8-pytest-style
+    "PTH", # flake8-use-pathlib
+    "PYI", # flake8-pyi
+    "Q", # flake8-quotes
+    "RET", # flake8-return
+    "RSE", # flake8-raise
+    "RUF", # Ruff-specific rules
+    "S", # flake8-bandit
+    "SIM", # flake8-simplify
+    "SLF", # flake8-self
+    "SLOT", # flake8-slots
+    "T10", # flake8-debugger
+    "T20", # flake8-print
+    "TC", # flake8-type-checking
+    "TD", # flake8-todos
+    "TID", # flake8-tidy-imports
+    "TRY", # tryceratops
+    "UP", # pyupgrade
+    "W" , # pycoodestyle
+    "YTT", # flake8-2020
+]
+ignore = [
+    "D105",  # Missing docstring in magic method
+    "D417",  # Missing argument description in the docstring
+]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+
+
+
